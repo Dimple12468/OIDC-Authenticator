@@ -20,12 +20,17 @@ public class SecurityConfig {
 	@SuppressWarnings("deprecation")
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/login*").permitAll();
-		http.authorizeRequests().antMatchers("/", "/login**");
-//		http.authorizeRequests(authorizeRequests -> authorizeRequests.antMatchers("/", "/login**").permitAll()
-//				.anyRequest().authenticated()).oauth2Login(oauth2 -> oauth2.loginPage("/login"));
-		return http.build();
+	    http
+	        .authorizeRequests(authorizeRequests ->
+	            authorizeRequests
+	                .antMatchers("/login**").permitAll() // Allow access to the login page without authentication
+	                .antMatchers("/", "/login**").permitAll() // Allow access to the root URL and the login page without authentication
+	                .anyRequest().authenticated() // Require authentication for all other URLs
+	        )
+	        .oauth2Login(oauth2 -> oauth2.loginPage("/login")); // Configure OAuth2 login support and specify the custom login page URL
+	    return http.build();
 	}
+
 
 	@Bean
 	public ClientRegistrationRepository clientRegistrationRepository() {
